@@ -1,5 +1,8 @@
 plugins {
-    id 'net.fabricmc.fabric-loom' version "${loom_version}"
+    // Mismo plugin que el port de Dragons Plus a 26.2. Desde 1.21.11-rc3 Mojang publica el juego
+    // sin obfuscar: no hay client_mappings en el manifest, no hay paso de remapeo, y fabric-loom
+    // falla al resolver mappings. loom-no-remap salta ese paso.
+    id 'dev.architectury.loom-no-remap' version "${loom_version}"
     id 'java-library'
     id 'maven-publish'
     id 'me.modmuss50.mod-publish-plugin' version '2.1.1'
@@ -27,7 +30,9 @@ sourceSets {
 
 loom {
     splitEnvironmentSourceSets()
-    accessWidenerPath = file('src/main/resources/create_enchantment_industry.accesswidener')
+    // En 26.2 el formato es classTweaker v1 official, no accessWidener v2. La propiedad de loom
+    // sigue llamandose accessWidenerPath y acepta el archivo nuevo.
+    accessWidenerPath = file('src/main/resources/create_enchantment_industry.classtweaker')
 
     mods {
         create_enchantment_industry {
@@ -58,6 +63,9 @@ loom {
 }
 
 repositories {
+    // Dragons Plus 26.2 todavia no esta publicado en maven.dragons.plus; se toma del port local.
+    // Correr `gradlew publishToMavenLocal` en C:\dev\create-dragons-plus-fly-26.2 antes de compilar.
+    mavenLocal()
     mavenCentral()
     maven {
         name = 'Fabric'
@@ -83,7 +91,24 @@ repositories {
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     implementation "net.fabricmc:fabric-loader:${loader_version}"
-    api "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+    // El artefacto fabric-api es un contenedor: 43 jars anidados, cero clases propias. Como
+    // `api`/`implementation` no aporta nada al classpath de compilacion, el sintoma es
+    // package-does-not-exist en cada import de fabric.api, no un error de jar faltante.
+    // Los modulos que este mod realmente usa van nombrados uno por uno; la lista sale de mapear
+    // los 30 imports de net.fabricmc.fabric.api.* contra los jars anidados de fabric-api.
+    api fabricApi.module("fabric-data-generation-api-v1", fabric_api_version)     // datagen.v1 y datagen.v1.provider
+    api fabricApi.module("fabric-events-interaction-v0", fabric_api_version)      // entity.FakePlayer
+    api fabricApi.module("fabric-lifecycle-events-v1", fabric_api_version)        // event.lifecycle.v1
+    api fabricApi.module("fabric-networking-api-v1", fabric_api_version)          // networking.v1 y client.networking.v1
+    api fabricApi.module("fabric-object-builder-api-v1", fabric_api_version)      // object.builder.v1.block.entity
+    api fabricApi.module("fabric-recipe-api-v1", fabric_api_version)              // recipe.v1.sync
+    api fabricApi.module("fabric-rendering-fluids-v1", fabric_api_version)        // client.render.fluid.v1
+    api fabricApi.module("fabric-resource-conditions-api-v1", fabric_api_version) // resource.conditions.v1
+    api fabricApi.module("fabric-transfer-api-v1", fabric_api_version)            // transfer.v1.*
+    // No se importa directo, pero las clases de transfer.v1 lo referencian en sus firmas.
+    api fabricApi.module("fabric-api-lookup-api-v1", fabric_api_version)
+    // Sigue haciendo falta en runtime para el resto de la API y para la metadata de JiJ.
+    runtimeOnly "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
     api("maven.modrinth:create-fly:${create_fly_version}") { transitive = false }
     api("plus.dragons.createdragonsplus:create-dragons-plus-fly-${minecraft_version}:${create_dragons_plus_version}") {
         transitive = false
@@ -99,6 +124,7 @@ processResources {
     def replaceProperties = [
             version                     : project.version,
             minecraft_version           : minecraft_version,
+            minecraft_version_range     : minecraft_version_range,
             java_version                : java_version,
             loader_version              : loader_version,
             fabric_api_version          : fabric_api_version,

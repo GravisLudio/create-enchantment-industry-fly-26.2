@@ -1,0 +1,12 @@
+classTweaker	v1	official
+
+# Portado desde create_enchantment_industry.accesswidener (accessWidener v2 official, MC 26.1.2).
+# En 26.2 el formato es classTweaker v1; el namespace sigue siendo `official` porque el juego ya
+# viene sin obfuscar.
+#
+# Verificado contra el jar de 26.2: los dos miembros existen con el mismo descriptor y siguen siendo
+# private, asi que las dos entradas siguen haciendo falta.
+#   private        count I
+#   private        setValue (I)V
+accessible	field	net/minecraft/world/entity/ExperienceOrb	count	I
+accessible	method	net/minecraft/world/entity/ExperienceOrb	setValue	(I)V
