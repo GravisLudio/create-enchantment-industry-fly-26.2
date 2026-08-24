@@ -44,19 +44,28 @@ public class ExperienceHelper {
     }
 
     public static int getExperienceForTotalLevel(int level) {
-        if (level == 0)
+        if (level <= 0)
             return 0;
+        // En long y no en int: `9 * level * level` desborda int a partir del nivel 15444 y devuelve
+        // un negativo, que despues se propaga como experiencia negativa. El clamp final deja el
+        // resultado en rango sin cambiar ningun valor alcanzable en la practica.
+        long total;
         if (level >= 31)
-            return (9 * level * level - 325 * level) / 2 + 2220;
-        if (level >= 16)
-            return (5 * level * level - 81 * level) / 2 + 360;
-        return level * level + 6 * level;
+            total = (9L * level * level - 325L * level) / 2 + 2220;
+        else if (level >= 16)
+            total = (5L * level * level - 81L * level) / 2 + 360;
+        else
+            total = (long) level * level + 6L * level;
+        return (int) Math.min(total, Integer.MAX_VALUE);
     }
 
     public static int getExperienceForPlayer(Player player) {
-        int experience = getExperienceForTotalLevel(player.experienceLevel);
+        long experience = getExperienceForTotalLevel(player.experienceLevel);
         experience += Math.round(player.experienceProgress * getExperienceForNextLevel(player.experienceLevel));
-        return experience;
+        // Mismo tope que ya se aplica a los orbes en getExperienceFromOrb: por encima de esto la
+        // conversion a unidades de fluido no entra en un int y CEIFluidUnits.stack tira
+        // ArithmeticException, tumbando el servidor al tickear un Experience Lantern.
+        return (int) Math.clamp(experience, 0, MAX_FLUID_CONVERTIBLE_EXPERIENCE);
     }
 
     public static int getExperienceFromFluid(FluidStack fluid) {
