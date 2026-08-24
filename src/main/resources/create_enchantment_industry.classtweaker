@@ -10,3 +10,9 @@ classTweaker	v1	official
 #   private        setValue (I)V
 accessible	field	net/minecraft/world/entity/ExperienceOrb	count	I
 accessible	method	net/minecraft/world/entity/ExperienceOrb	setValue	(I)V
+
+# Nuevo en 26.2: Output y TabVisibility pasaron a protected dentro de CreativeModeTab, y
+# CEICreativeModeTabs las necesita para poblar su pestana. Dragons Plus declara estas mismas dos
+# entradas, pero los class tweakers no se heredan de una dependencia: cada mod declara los suyos.
+accessible	class	net/minecraft/world/item/CreativeModeTab$Output
+accessible	class	net/minecraft/world/item/CreativeModeTab$TabVisibility

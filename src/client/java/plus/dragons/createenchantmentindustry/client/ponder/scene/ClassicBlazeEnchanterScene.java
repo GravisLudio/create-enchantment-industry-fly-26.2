@@ -29,12 +29,12 @@ import com.zurrtum.create.content.logistics.depot.DepotBlockEntity;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.WeatheringCopper;
 import net.minecraft.world.phys.Vec3;
 import plus.dragons.createdragonsplus.common.processing.blaze.BlazeBlock;
 import plus.dragons.createenchantmentindustry.client.ponder.CEIPonderScenes;
@@ -154,7 +154,7 @@ public class ClassicBlazeEnchanterScene {
                 .pointAt(util.vector().topOf(1, 2, 1));
         scene.idle(10);
         scene.world().modifyBlockEntity(util.grid().at(2, 2, 1), ClassicBlazeEnchanterBlockEntity.class, be -> be.insertItem(Items.DIAMOND_SWORD.getDefaultInstance(), false));
-        scene.world().setBlock(util.grid().at(1, 2, 1), Blocks.LIGHTNING_ROD.defaultBlockState(), true);
+        scene.world().setBlock(util.grid().at(1, 2, 1), Blocks.LIGHTNING_ROD.weathering().pick(WeatheringCopper.WeatherState.UNAFFECTED).defaultBlockState(), true);
         scene.idle(50);
         scene.world().createEntity(level -> {
             var lightning = EntityTypes.LIGHTNING_BOLT.create(level, EntitySpawnReason.LOAD);

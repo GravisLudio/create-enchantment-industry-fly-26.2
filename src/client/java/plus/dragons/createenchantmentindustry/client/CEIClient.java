@@ -26,7 +26,6 @@ import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntit
 import com.zurrtum.create.client.ponder.foundation.PonderIndex;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import plus.dragons.createdragonsplus.client.processing.blaze.BlazeRenderModelProvider;
 import plus.dragons.createdragonsplus.client.processing.blaze.BlazeRenderModels;
 import plus.dragons.createdragonsplus.common.processing.blaze.BlazeBlockVisual;
@@ -87,6 +86,10 @@ public final class CEIClient implements ClientModInitializer {
         BlazeMovementRenderBehaviour.attachTo(CEIBlocks.CLASSIC_BLAZE_ENCHANTER_MOVEMENT);
     }
 
+    // 26.2: BlockEntityRenderers.register paso a private, los mods ya no pueden llamarlo. El
+    // equivalente publico es AllBlockEntityRenders.render(type, provider) de Create Fly, que es la
+    // misma familia que ya usan visual() y normal() mas abajo, asi que todo el metodo queda
+    // registrando por la misma via en vez de mezclar dos APIs.
     private static void registerBlockEntityRenderers() {
         AllBlockEntityRenders.visual(
                 CEIBlockEntities.MECHANICAL_GRINDSTONE.get(),
@@ -96,9 +99,9 @@ public final class CEIClient implements ClientModInitializer {
                 CEIBlockEntities.GRINDSTONE_DRAIN.get(),
                 GrindstoneDrainRenderer::new,
                 SingleAxisRotatingVisual.of(CEIPartialModels.MECHANICAL_GRINDSTONE));
-        BlockEntityRenderers.register(
+        AllBlockEntityRenders.render(
                 CEIBlockEntities.EXPERIENCE_HATCH.get(), SmartBlockEntityRenderer::new);
-        BlockEntityRenderers.register(CEIBlockEntities.PRINTER.get(), PrinterRenderer::new);
+        AllBlockEntityRenders.render(CEIBlockEntities.PRINTER.get(), PrinterRenderer::new);
         AllBlockEntityRenders.normal(
                 CEIBlockEntities.BLAZE_ENCHANTER.get(),
                 BlazeEnchanterRenderer::new,
@@ -111,7 +114,7 @@ public final class CEIClient implements ClientModInitializer {
                 CEIBlockEntities.CLASSIC_BLAZE_ENCHANTER.get(),
                 ClassicBlazeEnchanterRenderer::new,
                 ClassicBlazeEnchanterVisual::new);
-        BlockEntityRenderers.register(
+        AllBlockEntityRenders.render(
                 CEIBlockEntities.EXPERIENCE_LANTERN.get(), SmartBlockEntityRenderer::new);
     }
 }

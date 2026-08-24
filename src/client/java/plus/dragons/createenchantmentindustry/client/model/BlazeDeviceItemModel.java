@@ -192,11 +192,15 @@ public final class BlazeDeviceItemModel
             PoseStack matrices = new PoseStack();
             matrices.last().pose().set(pose.pose());
             matrices.last().normal().set(pose.normal());
+            // 26.2 elimino la sobrecarga de 4 argumentos de Model.renderToBuffer; queda solo la que
+            // toma color. La que se fue delegaba en esta pasando -1 (verificado en el bytecode de
+            // 26.1.2: iconst_m1 justo antes del invoke), asi que -1 conserva el render tal cual.
             model.renderToBuffer(
                     matrices,
                     consumer,
                     LightCoordsUtil.FULL_BRIGHT,
-                    OverlayTexture.NO_OVERLAY);
+                    OverlayTexture.NO_OVERLAY,
+                    -1);
         }
     }
 

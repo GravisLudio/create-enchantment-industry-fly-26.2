@@ -18,7 +18,6 @@
 
 package plus.dragons.createenchantmentindustry.common.fluids.lantern;
 
-import net.minecraft.world.phys.Vec3;
 import static net.minecraft.world.level.block.DirectionalBlock.FACING;
 
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
@@ -36,6 +35,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import plus.dragons.createenchantmentindustry.common.fluids.experience.CEIExperienceTankBehaviour;
 import plus.dragons.createenchantmentindustry.common.fluids.experience.ExperienceHelper;

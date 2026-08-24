@@ -56,9 +56,14 @@ public final class CEIFluids {
         ResourceKey<Fluid> sourceKey = ResourceKey.create(Registries.FLUID, id);
         ResourceKey<Fluid> flowingKey = ResourceKey.create(Registries.FLUID, flowingId);
 
+        // 26.2: FluidEntry ya construye sus dos fluidos en los inicializadores de campo, y Still/Flowing
+        // son clases internas PRIVADAS de FluidEntry, no anidadas de FlowableFluid: no se instancian
+        // desde afuera, es deliberado. Antes esto hacia `new FlowableFluid.Still(internal)`; ahora solo
+        // hay que registrar los que el entry ya creo. Create Fly hace lo mismo en AllFluidEntries, y
+        // Dragons Plus lo resolvio igual en CDPFluids.
         internal = new FluidEntry();
-        internal.still = Registry.register(BuiltInRegistries.FLUID, sourceKey, new FlowableFluid.Still(internal));
-        internal.flowing = Registry.register(BuiltInRegistries.FLUID, flowingKey, new FlowableFluid.Flowing(internal));
+        Registry.register(BuiltInRegistries.FLUID, sourceKey, internal.still);
+        Registry.register(BuiltInRegistries.FLUID, flowingKey, internal.flowing);
         EXPERIENCE = new CDPFluidEntry<>(id, internal.still, internal.flowing, () -> internal.bucket, () -> internal.block);
         EXPERIENCE_FLOWING = EXPERIENCE;
     }

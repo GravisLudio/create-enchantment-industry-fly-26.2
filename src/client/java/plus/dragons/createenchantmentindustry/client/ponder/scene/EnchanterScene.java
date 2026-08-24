@@ -31,12 +31,12 @@ import com.zurrtum.create.content.logistics.depot.DepotBlockEntity;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.WeatheringCopper;
 import net.minecraft.world.phys.Vec3;
 import plus.dragons.createdragonsplus.common.processing.blaze.BlazeBlock;
 import plus.dragons.createenchantmentindustry.client.ponder.CEIPonderScenes;
@@ -248,9 +248,9 @@ public class EnchanterScene {
         scene.idle(70);
 
         scene.addKeyframe();
-        scene.world().setBlock(util.grid().at(3, 2, 1), Blocks.LIGHTNING_ROD.defaultBlockState(), false);
+        scene.world().setBlock(util.grid().at(3, 2, 1), Blocks.LIGHTNING_ROD.weathering().pick(WeatheringCopper.WeatherState.UNAFFECTED).defaultBlockState(), false);
         scene.idle(10);
-        scene.world().setBlock(util.grid().at(1, 2, 1), Blocks.LIGHTNING_ROD.defaultBlockState(), false);
+        scene.world().setBlock(util.grid().at(1, 2, 1), Blocks.LIGHTNING_ROD.weathering().pick(WeatheringCopper.WeatherState.UNAFFECTED).defaultBlockState(), false);
         scene.overlay().showText(40)
                 .text("Make sure to place a Lightning Rod nearby")
                 .placeNearTarget()

@@ -134,7 +134,9 @@ public record GrindingRecipe(
         GrindingRecipe recipe = new GrindingRecipe(
                 DEFAULT_TIME,
                 polishing.value().ingredient(),
-                List.of(new ProcessingOutput(polishing.value().result())),
+                // 26.2: SandPaperPolishingRecipe.result() devuelve ItemStackTemplate (record nuevo de
+                // vanilla) en vez de ItemStack. create() materializa el stack que espera ProcessingOutput.
+                List.of(new ProcessingOutput(polishing.value().result().create())),
                 List.of(),
                 List.of());
         return Optional.of(new RecipeHolder<>(ResourceKey.create(Registries.RECIPE, id), recipe));

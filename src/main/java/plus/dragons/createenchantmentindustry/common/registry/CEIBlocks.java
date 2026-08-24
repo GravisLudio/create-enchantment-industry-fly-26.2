@@ -30,6 +30,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.WeatheringCopper;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import plus.dragons.createdragonsplus.common.processing.blaze.BlazeBlock;
@@ -47,6 +48,8 @@ import plus.dragons.createenchantmentindustry.common.processing.forger.BlazeForg
 import plus.dragons.createenchantmentindustry.config.CEIConfig;
 
 /** Blocks are registered from {@link CEICreatePlugin#onBlockRegister()} during vanilla bootstrap. */
+// 26.2: Blocks.COPPER_BLOCK ya no es un Block sino un WeatheringCopperCollection<Block>, que agrupa
+// las cuatro etapas de oxidacion. Para las Properties hace falta la etapa sin oxidar concreta.
 public final class CEIBlocks {
     public static final CEIRegistryEntry<FluidBlock> EXPERIENCE = register(
             "experience",
@@ -61,18 +64,18 @@ public final class CEIBlocks {
     public static final CEIRegistryEntry<GrindstoneDrainBlock> GRINDSTONE_DRAIN = register(
             "grindstone_drain",
             properties -> new GrindstoneDrainBlock(MECHANICAL_GRINDSTONE.get(), properties),
-            BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK).requiresCorrectToolForDrops());
+            BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK.weathering().pick(WeatheringCopper.WeatherState.UNAFFECTED)).requiresCorrectToolForDrops());
     public static final CEIRegistryEntry<ExperienceHatchBlock> EXPERIENCE_HATCH = register(
             "experience_hatch",
             ExperienceHatchBlock::new,
-            BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK)
+            BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK.weathering().pick(WeatheringCopper.WeatherState.UNAFFECTED))
                     .mapColor(MapColor.COLOR_GREEN)
                     .requiresCorrectToolForDrops()
                     .lightLevel(state -> 12));
     public static final CEIRegistryEntry<PrinterBlock> PRINTER = register(
             "printer",
             PrinterBlock::new,
-            BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK).requiresCorrectToolForDrops());
+            BlockBehaviour.Properties.ofFullCopy(Blocks.COPPER_BLOCK.weathering().pick(WeatheringCopper.WeatherState.UNAFFECTED)).requiresCorrectToolForDrops());
     public static final CEIRegistryEntry<BlazeEnchanterBlock> BLAZE_ENCHANTER = register(
             "blaze_enchanter", BlazeEnchanterBlock::new, blazeProperties());
     public static final CEIRegistryEntry<BlazeForgerBlock> BLAZE_FORGER = register(
