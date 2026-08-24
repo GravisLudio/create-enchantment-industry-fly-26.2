@@ -21,10 +21,7 @@ package plus.dragons.createenchantmentindustry.common.fluids.printer;
 import static plus.dragons.createenchantmentindustry.common.fluids.printer.PrinterBlockEntity.PROCESSING_TIME;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.zurrtum.create.client.catnip.render.CachedBuffers;
 import com.zurrtum.create.client.catnip.render.FluidRenderHelper;
-import com.zurrtum.create.client.catnip.render.SuperByteBuffer;
 import com.zurrtum.create.client.foundation.blockEntity.renderer.SmartBlockEntityRenderer;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour.TankSegment;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
@@ -32,12 +29,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import plus.dragons.createenchantmentindustry.client.model.CEIPartialModels;
 
 /** Printer renderer that snapshots tank and piston animation state during extraction. */
 public final class PrinterRenderer
@@ -86,13 +81,21 @@ public final class PrinterRenderer
                     true);
         }
 
-        float progress = getProgress(printer.processingTicks - tickProgress);
-        state.machine = new MachineGeometry(
-                CachedBuffers.partial(CEIPartialModels.PRINTER_NOZZLE_TOP, printer.getBlockState()),
-                CachedBuffers.partial(CEIPartialModels.PRINTER_NOZZLE_BOTTOM, printer.getBlockState()),
-                CachedBuffers.partial(CEIPartialModels.PRINTER_PISTON, printer.getBlockState()),
-                progress,
-                state.lightCoords);
+        // La boquilla ya no se dibuja por piezas: vive entera dentro de block/printer/block.json.
+        //
+        // Los tres partials (nozzle_top, nozzle_bottom, piston) fueron authorizados como partes de un
+        // modelo unico y tienen caras omitidas a proposito -- nozzle_top y nozzle_bottom sin `up`, los
+        // tres elementos del eje del piston sin `down` -- porque en el modelo armado esas caras quedan
+        // tapadas por la pieza vecina. Al dibujarlas como geometria separada en el pase de moving block,
+        // mientras el cuerpo va en la malla del chunk en el pase solido, el conjunto se desarma: las
+        // caras que deberian taparse entre si no siempre lo hacen y el resultado cambia con el angulo
+        // de camara.
+        //
+        // Cerrarles las caras faltantes no alcanza (probado). Con la geometria dentro del modelo
+        // estatico se dibuja todo en un solo pase, como en el icono del item, que siempre se vio bien.
+        //
+        // El costo es la animacion del piston, que ya no se mueve al imprimir. getProgress queda
+        // porque la usa PrinterBlockEntity.
     }
 
     @Override
@@ -104,9 +107,6 @@ public final class PrinterRenderer
         super.submit(state, matrices, queue, cameraState);
         if (state.fluid != null) {
             state.fluid.submit(matrices, queue);
-        }
-        if (state.machine != null) {
-            queue.submitCustomGeometry(matrices, RenderTypes.solidMovingBlock(), state.machine);
         }
     }
 
@@ -128,21 +128,5 @@ public final class PrinterRenderer
 
     public static final class PrinterRenderState extends SmartRenderState {
         private @Nullable FluidRenderHelper.FluidRenderState fluid;
-        private @Nullable MachineGeometry machine;
-    }
-
-    private record MachineGeometry(
-            SuperByteBuffer top,
-            SuperByteBuffer bottom,
-            SuperByteBuffer piston,
-            float progress,
-            int light) implements SubmitNodeCollector.CustomGeometryRenderer {
-        @Override
-        public void render(PoseStack.Pose pose, VertexConsumer consumer) {
-            top.light(light).renderInto(pose, consumer);
-            pose.translate(0, 3 * progress / 32.0F, 0);
-            bottom.light(light).renderInto(pose, consumer);
-            piston.translate(0, -progress / 2.0F, 0).light(light).renderInto(pose, consumer);
-        }
     }
 }
