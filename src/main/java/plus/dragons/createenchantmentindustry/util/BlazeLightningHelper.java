@@ -26,6 +26,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.level.Level;
@@ -60,7 +61,7 @@ public class BlazeLightningHelper {
 
     @SuppressWarnings("all")
     public static boolean strikeLightning(ServerLevel level, BlockPos strikePos) {
-        var lightning = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.TRIGGERED);
+        var lightning = EntityTypes.LIGHTNING_BOLT.create(level, EntitySpawnReason.TRIGGERED);
         if (lightning == null)
             return false;
         lightning.addTag(LIGHTNING_BOLT_EXPERIENCE_CHARGE_KEY);

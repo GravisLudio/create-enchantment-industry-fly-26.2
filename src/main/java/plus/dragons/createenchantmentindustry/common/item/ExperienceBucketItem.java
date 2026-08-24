@@ -29,6 +29,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import plus.dragons.createenchantmentindustry.config.CEIConfig;
 import plus.dragons.createenchantmentindustry.util.CEIFluidUnits;
@@ -53,7 +54,7 @@ public final class ExperienceBucketItem extends FoilBucketItem {
         level.playSound(player, pos, SoundEvents.PLAYER_LEVELUP, SoundSource.BLOCKS, 0.5F, 1.0F);
         if (level instanceof ServerLevel serverLevel) {
             int experience = Math.toIntExact(CEIFluidUnits.toMillibuckets(FluidConstants.BUCKET));
-            ExperienceOrb.award(serverLevel, pos.getCenter(), experience);
+            ExperienceOrb.award(serverLevel, Vec3.atCenterOf(pos), experience);
         }
         return true;
     }

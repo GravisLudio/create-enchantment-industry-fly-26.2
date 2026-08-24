@@ -18,6 +18,7 @@
 
 package plus.dragons.createenchantmentindustry.common.fluids.lantern;
 
+import net.minecraft.world.phys.Vec3;
 import static net.minecraft.world.level.block.DirectionalBlock.FACING;
 
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
@@ -129,8 +130,8 @@ public class ExperienceLanternBlockEntity extends SmartBlockEntity {
         if (!experienceOrbs.isEmpty()) {
             for (var orb : experienceOrbs) {
                 if (orb.getDeltaMovement().length() <= .5) {
-                    var pushForce = CEIConfig.fluids().experienceLanternPullForceMultiplier.get() * 1 / orb.position().distanceTo(getBlockPos().getCenter());
-                    var directionToLantern = getBlockPos().getCenter().subtract(orb.position()).normalize().multiply(pushForce, pushForce, pushForce);
+                    var pushForce = CEIConfig.fluids().experienceLanternPullForceMultiplier.get() * 1 / orb.position().distanceTo(Vec3.atCenterOf(getBlockPos()));
+                    var directionToLantern = Vec3.atCenterOf(getBlockPos()).subtract(orb.position()).normalize().multiply(pushForce, pushForce, pushForce);
                     orb.push(directionToLantern.x, directionToLantern.y, directionToLantern.z);
                 }
             }

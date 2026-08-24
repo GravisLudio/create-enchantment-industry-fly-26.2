@@ -32,6 +32,7 @@ import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -260,7 +261,7 @@ public class EnchanterScene {
         scene.overlay().showControls(util.vector().centerOf(2, 3, 1), Pointing.DOWN, 20).withItem(CEIItems.SUPER_ENCHANTING_TEMPLATE.asStack());
         scene.idle(50);
         scene.world().createEntity(level -> {
-            var lightning = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.LOAD);
+            var lightning = EntityTypes.LIGHTNING_BOLT.create(level, EntitySpawnReason.LOAD);
             Vec3 position = Vec3.atBottomCenterOf(util.grid().at(3, 2, 1));
             lightning.setPos(position.x, position.y, position.z);
             return lightning;
@@ -312,7 +313,7 @@ public class EnchanterScene {
         scene.overlay().showControls(util.vector().of(2, 3, 1), Pointing.DOWN, 20).withItem(CEIItems.SUPER_ENCHANTING_TEMPLATE.asStack());
         scene.idle(50);
         scene.world().createEntity(level -> {
-            var lightning = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.LOAD);
+            var lightning = EntityTypes.LIGHTNING_BOLT.create(level, EntitySpawnReason.LOAD);
             Vec3 position = Vec3.atBottomCenterOf(util.grid().at(2, 2, 1));
             lightning.setPos(position.x, position.y, position.z);
             return lightning;

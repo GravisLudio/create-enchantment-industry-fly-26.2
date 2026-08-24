@@ -88,9 +88,19 @@ public class GrindstoneDrainBlock extends HorizontalKineticBlock implements IBE<
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 
+    // 26.2 elimino Block.updateEntityMovementAfterFallOn(BlockGetter, Entity). En vanilla la logica
+    // que vivia ahi se replegó dentro de fallOn: SlimeBlock y BedBlock, los dos unicos que lo
+    // sobrescribian, perdieron el metodo (y SlimeBlock perdio ademas su helper bounceUp) y ahora
+    // hacen todo en fallOn. Este bloque sigue el mismo camino.
+    //
+    // El lookup se mantiene con entityIn.blockPosition() y no con el `pos` que trae fallOn, para no
+    // cambiar el comportamiento: la SHAPE del drain es CASING_13PX, o sea 13 de 16 pixeles de alto,
+    // asi que un item apoyado encima queda dentro de la celda del propio drain y blockPosition()
+    // devuelve la posicion del drain. `pos` en fallOn es el bloque pisado, que normalmente coincide,
+    // pero no es la misma cuenta y no hace falta arriesgarla.
     @Override
-    public void updateEntityMovementAfterFallOn(BlockGetter worldIn, Entity entityIn) {
-        super.updateEntityMovementAfterFallOn(worldIn, entityIn);
+    public void fallOn(Level level, BlockState state, BlockPos pos, Entity entityIn, double fallDistance) {
+        super.fallOn(level, state, pos, entityIn, fallDistance);
 
         if (entityIn.level().isClientSide())
             return;
@@ -98,7 +108,7 @@ public class GrindstoneDrainBlock extends HorizontalKineticBlock implements IBE<
             return;
         if (!entityIn.isAlive())
             return;
-        GrindstoneDrainBlockEntity drain = getBlockEntity(worldIn, entityIn.blockPosition());
+        GrindstoneDrainBlockEntity drain = getBlockEntity(level, entityIn.blockPosition());
         if (drain == null)
             return;
 

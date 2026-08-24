@@ -32,6 +32,7 @@ import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -245,7 +246,7 @@ public class ForgerScene {
                 be -> be.insertItem(template, false));
         scene.idle(50);
         scene.world().createEntity(level -> {
-            var lightning = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.LOAD);
+            var lightning = EntityTypes.LIGHTNING_BOLT.create(level, EntitySpawnReason.LOAD);
             Vec3 position = Vec3.atBottomCenterOf(util.grid().at(2, 2, 2));
             lightning.setPos(position.x, position.y, position.z);
             return lightning;
@@ -301,7 +302,7 @@ public class ForgerScene {
                 be -> be.insertItem(template, false));
         scene.idle(50);
         scene.world().createEntity(level -> {
-            var lightning = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.LOAD);
+            var lightning = EntityTypes.LIGHTNING_BOLT.create(level, EntitySpawnReason.LOAD);
             Vec3 position = Vec3.atBottomCenterOf(util.grid().at(2, 2, 1));
             lightning.setPos(position.x, position.y, position.z);
             return lightning;

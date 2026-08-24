@@ -60,7 +60,7 @@ public enum BannerPatternPrintingRecipeJEI implements PrintingRecipeJEI {
         var level = Minecraft.getInstance().level;
         if (level != null)
             level.registryAccess().lookupOrThrow(Registries.BANNER_PATTERN).listElements()
-                    .map(pattern -> withPattern(Items.WHITE_BANNER.getDefaultInstance(), pattern, DyeColor.BLACK))
+                    .map(pattern -> withPattern(Items.BANNER.pick(DyeColor.WHITE).getDefaultInstance(), pattern, DyeColor.BLACK))
                     .forEach(slot::add);
         slot.addRichTooltipCallback((view, tooltip) -> tooltip.add(CEILang
                 .translate("recipe.printing.banner_pattern.template")
@@ -77,7 +77,7 @@ public enum BannerPatternPrintingRecipeJEI implements PrintingRecipeJEI {
 
     @Override
     public void setOutput(IRecipeSlotBuilder slot) {
-        slot.add(Items.WHITE_BANNER);
+        slot.add(Items.BANNER.pick(DyeColor.WHITE));
         slot.addRichTooltipCallback((view, tooltip) -> tooltip.add(CEILang
                 .translate("recipe.printing.banner_pattern.color_follow_dye")
                 .style(ChatFormatting.GRAY)

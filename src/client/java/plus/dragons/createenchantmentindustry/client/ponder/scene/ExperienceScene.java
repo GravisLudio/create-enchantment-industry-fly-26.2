@@ -39,6 +39,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.WalkAnimationState;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.item.DyeColor;
@@ -196,7 +197,7 @@ public class ExperienceScene {
         scene.idle(30);
 
         ElementLink<EntityElement> sheep = scene.world().createEntity(w -> {
-            Sheep entity = EntityType.SHEEP.create(w, EntitySpawnReason.LOAD);
+            Sheep entity = EntityTypes.SHEEP.create(w, EntitySpawnReason.LOAD);
             entity.setColor(DyeColor.PINK);
             Vec3 p = util.vector().topOf(util.grid().at(3, 3, 10));
             entity.setPos(p.x, p.y, p.z);
@@ -216,17 +217,17 @@ public class ExperienceScene {
         scene.world().modifyEntity(sheep, Entity::discard);
         scene.effects().emitParticles(util.vector().topOf(util.grid().at(3, 3, 10))
                 .add(0, -.25, 0),
-                scene.effects().particleEmitterWithinBlockSpace(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.RED_CONCRETE.defaultBlockState()),
+                scene.effects().particleEmitterWithinBlockSpace(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.CONCRETE.pick(DyeColor.RED).defaultBlockState()),
                         util.vector().centerOf(0, 0, 0)),
                 25, 1);
-        ElementLink<EntityElement> itemEntity = scene.world().createItemEntity(util.vector().blockSurface(util.grid().at(3, 2, 10), Direction.DOWN, 0), util.vector().of(0, 0, 0), new ItemStack(Items.PINK_WOOL));
+        ElementLink<EntityElement> itemEntity = scene.world().createItemEntity(util.vector().blockSurface(util.grid().at(3, 2, 10), Direction.DOWN, 0), util.vector().of(0, 0, 0), new ItemStack(Items.WOOL.pick(DyeColor.PINK)));
         ElementLink<EntityElement> itemEntity2 = scene.world().createItemEntity(
                 util.vector().blockSurface(util.grid().at(3, 2, 10), Direction.DOWN, 0),
                 util.vector().of(0, 0, 0),
                 AllItems.EXP_NUGGET.getDefaultInstance());
         scene.idle(13);
         scene.world().modifyEntity(itemEntity, Entity::discard);
-        scene.world().createItemOnBelt(util.grid().at(3, 1, 10), Direction.DOWN, new ItemStack(Items.PINK_WOOL));
+        scene.world().createItemOnBelt(util.grid().at(3, 1, 10), Direction.DOWN, new ItemStack(Items.WOOL.pick(DyeColor.PINK)));
         scene.idle(10);
         scene.world().modifyEntity(itemEntity2, Entity::discard);
         scene.world().createItemOnBelt(util.grid().at(3, 1, 10), Direction.DOWN, AllItems.EXP_NUGGET.getDefaultInstance());
@@ -261,7 +262,7 @@ public class ExperienceScene {
         scene.world().setKineticSpeed(deployer, 32f);
 
         ElementLink<EntityElement> sheep2 = scene.world().createEntity(w -> {
-            Sheep entity = EntityType.SHEEP.create(w, EntitySpawnReason.LOAD);
+            Sheep entity = EntityTypes.SHEEP.create(w, EntitySpawnReason.LOAD);
             entity.setColor(DyeColor.PINK);
             Vec3 p = util.vector().topOf(util.grid().at(6, 1, 6));
             entity.setPos(p.x, p.y, p.z);
@@ -283,7 +284,7 @@ public class ExperienceScene {
         scene.world().modifyEntity(sheep2, Entity::discard);
         scene.effects().emitParticles(util.vector().topOf(deployerPos.north(2))
                 .add(0, -.25, 0),
-                scene.effects().particleEmitterWithinBlockSpace(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.PINK_WOOL.defaultBlockState()),
+                scene.effects().particleEmitterWithinBlockSpace(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.WOOL.pick(DyeColor.PINK).defaultBlockState()),
                         util.vector().of(0, 0, 0)),
                 25, 1);
         scene.world().moveDeployer(deployerPos, -1, 25);
@@ -297,7 +298,7 @@ public class ExperienceScene {
         scene.idle(20);
 
         scene.world().flapFunnel(deployerPos.west(), true);
-        scene.world().createItemOnBelt(deployerPos.west().below(), Direction.SOUTH, new ItemStack(Items.PINK_WOOL));
+        scene.world().createItemOnBelt(deployerPos.west().below(), Direction.SOUTH, new ItemStack(Items.WOOL.pick(DyeColor.PINK)));
         scene.idle(20);
 
         // spout
@@ -458,7 +459,7 @@ public class ExperienceScene {
         scene.world().showSection(util.select().position(1, 2, 1), Direction.DOWN);
         scene.idle(55);
         scene.world().createEntity(level -> {
-            var lightning = EntityType.LIGHTNING_BOLT.create(level, EntitySpawnReason.LOAD);
+            var lightning = EntityTypes.LIGHTNING_BOLT.create(level, EntitySpawnReason.LOAD);
             Vec3 position = Vec3.atBottomCenterOf(util.grid().at(1, 2, 1));
             lightning.setPos(position.x, position.y, position.z);
             return lightning;
