@@ -1,6 +1,5 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "misc",
   "ingredients": [
     "create_dragons_plus:blaze_upgrade_smithing_template",
     "create:sturdy_sheet",
