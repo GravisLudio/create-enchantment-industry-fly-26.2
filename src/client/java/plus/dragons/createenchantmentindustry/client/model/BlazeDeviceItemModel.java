@@ -109,7 +109,16 @@ public final class BlazeDeviceItemModel
 
         addLayer(state, displayContext, base, base.properties(), foil);
         if (hat != null) {
-            addLayer(state, displayContext, hat, hat.properties(), foil);
+            // El hat usa los transforms del BASE, no los suyos. block/blaze/enchanter_hat.json no tiene
+            // parent ni bloque display, asi que ModelRenderProperties.fromResolvedModel le devuelve
+            // transforms por defecto, mientras el base hereda los de block/block via
+            // create:block/blaze_burner/block_with_blaze (firstperson_righthand con scale 0.4).
+            // Con hat.properties() las dos capas se dibujan a escalas y posiciones distintas y el hat
+            // se despega del quemador: en primera persona queda una campana gigante flotando.
+            //
+            // Upstream tenia base.properties() hasta la migracion a 26.1.2 (commit c7180bb), que lo
+            // cambio a hat.properties() e introdujo el bug. Esto lo revierte.
+            addLayer(state, displayContext, hat, base.properties(), foil);
         }
         if (book) {
             LayerRenderState layer = state.newLayer();
