@@ -20,9 +20,13 @@ package plus.dragons.createenchantmentindustry.common.fluids.lantern;
 
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.block.WrenchableDirectionalBlock;
+import com.zurrtum.create.infrastructure.fluids.FluidInventory;
+import com.zurrtum.create.infrastructure.fluids.FluidInventoryProvider;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -30,15 +34,23 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
 import plus.dragons.createenchantmentindustry.common.registry.CEIBlockEntities;
 import plus.dragons.createenchantmentindustry.common.registry.CEIShapes;
 
-public class ExperienceLanternBlock extends WrenchableDirectionalBlock implements IBE<ExperienceLanternBlockEntity> {
+public class ExperienceLanternBlock extends WrenchableDirectionalBlock
+        implements IBE<ExperienceLanternBlockEntity>, FluidInventoryProvider<ExperienceLanternBlockEntity> {
     public static final IntegerProperty LIGHT = IntegerProperty.create("light", 0, 15);
 
     public ExperienceLanternBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(LIGHT, 0));
+    }
+
+    @Override
+    public @Nullable FluidInventory getFluidInventory(
+            LevelAccessor level, BlockPos pos, BlockState state, ExperienceLanternBlockEntity be, @Nullable Direction side) {
+        return be.getFluidInventory(side);
     }
 
     @Override

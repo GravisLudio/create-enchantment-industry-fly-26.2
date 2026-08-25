@@ -23,6 +23,7 @@ import static net.minecraft.world.level.block.DirectionalBlock.FACING;
 import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
+import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.transfer.FluidInventoryStorage;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -169,6 +170,13 @@ public class ExperienceLanternBlockEntity extends SmartBlockEntity {
     public @Nullable Storage<FluidVariant> getFluidStorage(@Nullable Direction side) {
         return tank != null && (side == null || side.getOpposite() == getBlockState().getValue(FACING))
                 ? FluidInventoryStorage.of(tank.getCapability(), side)
+                : null;
+    }
+
+    /** Camino nativo de Create; evita el puente de Fabric, que compara create:fluid_max_capacity. */
+    public @Nullable FluidInventory getFluidInventory(@Nullable Direction side) {
+        return tank != null && (side == null || side.getOpposite() == getBlockState().getValue(FACING))
+                ? tank.getCapability()
                 : null;
     }
 }

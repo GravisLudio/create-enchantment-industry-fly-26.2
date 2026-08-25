@@ -19,10 +19,13 @@
 package plus.dragons.createenchantmentindustry.common.fluids.experience;
 
 import com.zurrtum.create.AllItems;
+import com.zurrtum.create.infrastructure.fluids.FluidInventory;
+import com.zurrtum.create.infrastructure.fluids.FluidInventoryProvider;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -30,15 +33,23 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import plus.dragons.createdragonsplus.common.processing.blaze.BlazeBlock;
 
-public abstract class BlazeExperienceBlock<T extends BlazeExperienceBlockEntity> extends BlazeBlock<T> {
+public abstract class BlazeExperienceBlock<T extends BlazeExperienceBlockEntity> extends BlazeBlock<T>
+        implements FluidInventoryProvider<T> {
     public BlazeExperienceBlock(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public @Nullable FluidInventory getFluidInventory(
+            LevelAccessor level, BlockPos pos, BlockState state, T blockEntity, @Nullable Direction side) {
+        return blockEntity.getFluidInventory(side);
     }
 
     @Override

@@ -26,6 +26,8 @@ import com.zurrtum.create.content.fluids.pipes.FluidPipeBlock;
 import com.zurrtum.create.content.kinetics.base.HorizontalKineticBlock;
 import com.zurrtum.create.content.schematics.requirement.ItemRequirement;
 import com.zurrtum.create.foundation.block.IBE;
+import com.zurrtum.create.infrastructure.fluids.FluidInventory;
+import com.zurrtum.create.infrastructure.fluids.FluidInventoryProvider;
 import java.util.List;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -43,6 +45,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -54,7 +57,9 @@ import org.jetbrains.annotations.Nullable;
 import plus.dragons.createenchantmentindustry.common.advancement.AdvancementBehaviour;
 import plus.dragons.createenchantmentindustry.common.registry.CEIBlockEntities;
 
-public class GrindstoneDrainBlock extends HorizontalKineticBlock implements IBE<GrindstoneDrainBlockEntity>, SpecialBlockItemRequirement {
+public class GrindstoneDrainBlock extends HorizontalKineticBlock
+        implements IBE<GrindstoneDrainBlockEntity>, SpecialBlockItemRequirement,
+        FluidInventoryProvider<GrindstoneDrainBlockEntity> {
     protected static VoxelShape SHAPE = new AllShapes.Builder(AllShapes.CASING_13PX.get(Direction.UP))
             .add(3, 3, 3, 13, 13, 13)
             .build();
@@ -63,6 +68,12 @@ public class GrindstoneDrainBlock extends HorizontalKineticBlock implements IBE<
     public GrindstoneDrainBlock(MechanicalGrindstoneBlock grindstone, Properties properties) {
         super(properties);
         this.grindstone = grindstone;
+    }
+
+    @Override
+    public @Nullable FluidInventory getFluidInventory(
+            LevelAccessor level, BlockPos pos, BlockState state, GrindstoneDrainBlockEntity be, @Nullable Direction side) {
+        return be.getFluidInventory(side);
     }
 
     @Override

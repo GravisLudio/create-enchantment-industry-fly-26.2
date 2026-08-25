@@ -22,12 +22,13 @@ import com.zurrtum.create.api.behaviour.BlockEntityBehaviour;
 import com.zurrtum.create.content.processing.burner.BlazeBurnerBlock.HeatLevel;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour.TankSegment;
+import com.zurrtum.create.infrastructure.fluids.CombinedTankWrapper;
+import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
 import com.zurrtum.create.infrastructure.transfer.FluidInventoryStorage;
 import java.util.List;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -57,6 +58,18 @@ public abstract class BlazeExperienceBlockEntity extends BlazeBlockEntity {
     private boolean creative;
     protected CEIExperienceTankBehaviour normalTank;
     protected CEIExperienceTankBehaviour specialTank;
+    /**
+     * Los dos tanques vistos como un solo FluidInventory nativo, que es lo que consume la red de fluidos de
+     * Create. Antes esto se exponia unicamente como Storage<FluidVariant> de Fabric, y ese puente compara
+     * el componente create:fluid_max_capacity al decidir si el fluido entrante encaja con el ya almacenado
+     * (FluidInventoryStorage.matches -> containsAll sobre los patches crudos). Como el tanque estampa su
+     * propia capacidad en el stack guardado, a partir de la primera insercion el patch almacenado dejaba de
+     * contener el del origen y toda insercion posterior se rechazaba: la maquina aceptaba una bocanada y no
+     * volvia a admitir nada. El camino nativo usa FluidInventory.matches, que va por
+     * areFluidsAndComponentsEqualIgnoreCapacity y por tanto ignora ese componente. Es lo mismo que hacen
+     * FluidTankBlock, SpoutBlock o BasinBlock, y equivale al CombinedTankWrapper de la version NeoForge.
+     */
+    private @Nullable CombinedTankWrapper combinedInventory;
 
     public BlazeExperienceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -71,6 +84,7 @@ public abstract class BlazeExperienceBlockEntity extends BlazeBlockEntity {
         specialTank = new CEIExperienceTankBehaviour(SmartFluidTankBehaviour.OUTPUT, this, capacity, false);
         behaviours.add(normalTank);
         behaviours.add(specialTank);
+        combinedInventory = null;
     }
 
     @Override
@@ -158,9 +172,22 @@ public abstract class BlazeExperienceBlockEntity extends BlazeBlockEntity {
         if (normalTank == null || specialTank == null || isRemoved() || side != null && side != Direction.DOWN) {
             return null;
         }
-        return new CombinedStorage<>(List.of(
-                FluidInventoryStorage.of(normalTank.getCapability(), side),
-                FluidInventoryStorage.of(specialTank.getCapability(), side)));
+        return FluidInventoryStorage.of(getCombinedInventory(), side);
+    }
+
+    /** Camino nativo: lo que consulta la red de fluidos de Create antes de recurrir al puente de Fabric. */
+    public @Nullable FluidInventory getFluidInventory(@Nullable Direction side) {
+        if (normalTank == null || specialTank == null || isRemoved() || side != null && side != Direction.DOWN) {
+            return null;
+        }
+        return getCombinedInventory();
+    }
+
+    private CombinedTankWrapper getCombinedInventory() {
+        if (combinedInventory == null) {
+            combinedInventory = new CombinedTankWrapper(normalTank.getCapability(), specialTank.getCapability());
+        }
+        return combinedInventory;
     }
 
     public boolean consumeExperience(int amount, boolean special, boolean simulate) {

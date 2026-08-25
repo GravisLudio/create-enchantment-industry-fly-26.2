@@ -31,6 +31,7 @@ import com.zurrtum.create.content.kinetics.belt.transport.TransportedItemStack;
 import com.zurrtum.create.foundation.blockEntity.SmartBlockEntity;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.transfer.FluidInventoryStorage;
 import java.util.List;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
@@ -90,6 +91,11 @@ public class PrinterBlockEntity extends SmartBlockEntity {
         return tank != null && side != Direction.DOWN
                 ? FluidInventoryStorage.of(tank.getCapability(), side)
                 : null;
+    }
+
+    /** Camino nativo de Create; evita el puente de Fabric, que compara create:fluid_max_capacity. */
+    public @Nullable FluidInventory getFluidInventory(@Nullable Direction side) {
+        return tank != null && side != Direction.DOWN ? tank.getCapability() : null;
     }
 
     private FluidStack getFluidInTank() {

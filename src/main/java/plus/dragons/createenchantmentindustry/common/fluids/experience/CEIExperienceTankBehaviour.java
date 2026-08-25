@@ -144,14 +144,26 @@ public final class CEIExperienceTankBehaviour extends SmartFluidTankBehaviour {
             owner = (CEIExperienceTankBehaviour) behaviour;
         }
 
+        /**
+         * El candado de externalInsertion va aqui y no solo en canInsert. Create Fly consulta
+         * SidedFluidInventory.canInsert(slot, stack, dir) unicamente desde SidedFluidInventorySlotWrapper,
+         * es decir solo cuando la consulta trae cara; con side == null usa FluidInventorySlotWrapper, que
+         * llama a isValid(slot, stack) y nada mas. Con el candado solo en canInsert, el tanque especial
+         * aceptaba fluido por cualquier camino sin cara -- entre ellos ExperienceHatchBlock, que pasa null
+         * explicito -- y el CombinedStorage de BlazeExperienceBlockEntity derramaba en el el excedente del
+         * tanque normal. NeoForge no tiene esa fuga porque alli el equivalente es
+         * ConfigurableFluidTank.forbidInsertion(), aplicado dentro de fill() y por tanto en todos los
+         * caminos. isValid solo lo usan las rutas de insercion de FluidInventory, asi que esto no toca la
+         * extraccion ni la insercion interna de la maquina, que pasa por insertExperience.
+         */
         @Override
         public boolean isValid(int slot, FluidStack stack) {
-            return !stack.isEmpty() && stack.getFluid() == CEIFluids.EXPERIENCE.getSource();
+            return owner.externalInsertion && !stack.isEmpty() && stack.getFluid() == CEIFluids.EXPERIENCE.getSource();
         }
 
         @Override
         public boolean canInsert(int slot, FluidStack stack, Direction direction) {
-            return owner.externalInsertion && super.canInsert(slot, stack, direction) && isValid(slot, stack);
+            return super.canInsert(slot, stack, direction) && isValid(slot, stack);
         }
 
         @Override

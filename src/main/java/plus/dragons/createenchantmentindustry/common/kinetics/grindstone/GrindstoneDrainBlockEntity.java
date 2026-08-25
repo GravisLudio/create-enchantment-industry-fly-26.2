@@ -29,6 +29,7 @@ import com.zurrtum.create.content.processing.recipe.ProcessingInventory;
 import com.zurrtum.create.foundation.blockEntity.behaviour.fluid.SmartFluidTankBehaviour;
 import com.zurrtum.create.foundation.fluid.FluidIngredient;
 import com.zurrtum.create.infrastructure.fluids.FluidStack;
+import com.zurrtum.create.infrastructure.fluids.FluidInventory;
 import com.zurrtum.create.infrastructure.transfer.FluidInventoryStorage;
 import java.util.List;
 import java.util.Optional;
@@ -124,6 +125,15 @@ public class GrindstoneDrainBlockEntity extends KineticBlockEntity implements Cl
                 && (side == null
                         || side == getBlockState().getValue(HorizontalKineticBlock.HORIZONTAL_FACING).getOpposite())
                                 ? FluidInventoryStorage.of(tank.getCapability(), side)
+                                : null;
+    }
+
+    /** Camino nativo de Create; evita el puente de Fabric, que compara create:fluid_max_capacity. */
+    public @Nullable FluidInventory getFluidInventory(@Nullable Direction side) {
+        return tank != null
+                && (side == null
+                        || side == getBlockState().getValue(HorizontalKineticBlock.HORIZONTAL_FACING).getOpposite())
+                                ? tank.getCapability()
                                 : null;
     }
 

@@ -23,6 +23,8 @@ import com.zurrtum.create.AllShapes;
 import com.zurrtum.create.content.equipment.wrench.IWrenchable;
 import com.zurrtum.create.foundation.block.IBE;
 import com.zurrtum.create.foundation.blockEntity.ComparatorUtil;
+import com.zurrtum.create.infrastructure.fluids.FluidInventory;
+import com.zurrtum.create.infrastructure.fluids.FluidInventoryProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
@@ -30,6 +32,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -44,13 +47,20 @@ import org.jetbrains.annotations.Nullable;
 import plus.dragons.createenchantmentindustry.common.advancement.AdvancementBehaviour;
 import plus.dragons.createenchantmentindustry.common.registry.CEIBlockEntities;
 
-public class PrinterBlock extends HorizontalDirectionalBlock implements IWrenchable, IBE<PrinterBlockEntity> {
+public class PrinterBlock extends HorizontalDirectionalBlock
+        implements IWrenchable, IBE<PrinterBlockEntity>, FluidInventoryProvider<PrinterBlockEntity> {
     public static final MapCodec<PrinterBlock> CODEC = simpleCodec(PrinterBlock::new);
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public PrinterBlock(Properties properties) {
         super(properties);
         registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
+    }
+
+    @Override
+    public @Nullable FluidInventory getFluidInventory(
+            LevelAccessor level, BlockPos pos, BlockState state, PrinterBlockEntity be, @Nullable Direction side) {
+        return be.getFluidInventory(side);
     }
 
     @Override
