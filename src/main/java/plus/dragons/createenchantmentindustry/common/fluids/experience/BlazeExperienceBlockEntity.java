@@ -69,7 +69,7 @@ public abstract class BlazeExperienceBlockEntity extends BlazeBlockEntity {
      * areFluidsAndComponentsEqualIgnoreCapacity y por tanto ignora ese componente. Es lo mismo que hacen
      * FluidTankBlock, SpoutBlock o BasinBlock, y equivale al CombinedTankWrapper de la version NeoForge.
      */
-    private @Nullable CombinedTankWrapper combinedInventory;
+    private @Nullable ExperienceTanks combinedInventory;
 
     public BlazeExperienceBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -81,7 +81,13 @@ public abstract class BlazeExperienceBlockEntity extends BlazeBlockEntity {
     public void addBehaviours(List<BlockEntityBehaviour<?>> behaviours) {
         int capacity = Math.toIntExact(CEIFluidUnits.millibuckets(getExperienceTankCapacity()));
         normalTank = new CEIExperienceTankBehaviour(SmartFluidTankBehaviour.INPUT, this, capacity, true);
-        specialTank = new CEIExperienceTankBehaviour(SmartFluidTankBehaviour.OUTPUT, this, capacity, false);
+        // El tanque especial acepta insercion externa a proposito, a diferencia de upstream y de NeoForge,
+        // donde equivale a ConfigurableFluidTank.forbidInsertion(). Los dos tanques van en ese orden dentro
+        // de ExperienceTanks, asi que el excedente del normal desborda al especial y la maquina admite
+        // capacity * 2 en total. Es una decision de diseno: convierte experiencia normal en super sin pasar
+        // por el rayo que carga el Super Experience Block, y como getHeatLevel() devuelve SEETHING en cuanto
+        // el especial tiene algo, deja la maquina en modo Super.
+        specialTank = new CEIExperienceTankBehaviour(SmartFluidTankBehaviour.OUTPUT, this, capacity, true);
         behaviours.add(normalTank);
         behaviours.add(specialTank);
         combinedInventory = null;
@@ -183,11 +189,40 @@ public abstract class BlazeExperienceBlockEntity extends BlazeBlockEntity {
         return getCombinedInventory();
     }
 
-    private CombinedTankWrapper getCombinedInventory() {
+    private ExperienceTanks getCombinedInventory() {
         if (combinedInventory == null) {
-            combinedInventory = new CombinedTankWrapper(normalTank.getCapability(), specialTank.getCapability());
+            combinedInventory = new ExperienceTanks(normalTank.getCapability(), specialTank.getCapability());
         }
         return combinedInventory;
+    }
+
+    /**
+     * CombinedTankWrapper no reimplementa isValid ni getMaxAmountPerStack, y los defaults de FluidInventory
+     * son {@code return true} y {@code return Integer.MAX_VALUE}. Sin delegarlos, toda consulta sin cara --
+     * entre ellas ExperienceHatchBlock, que pasa null explicito -- veia los dos tanques sin filtro de fluido
+     * y sin tope de capacidad: el tanque especial aceptaba el excedente del normal, y lo aceptaba sin limite.
+     * El camino con cara no se veia afectado porque CombinedTankWrapper si reimplementa canInsert.
+     */
+    private static final class ExperienceTanks extends CombinedTankWrapper {
+        private ExperienceTanks(FluidInventory... tanks) {
+            super(tanks);
+        }
+
+        @Override
+        public boolean isValid(int slot, FluidStack stack) {
+            int index = getIndexForSlot(slot);
+            FluidInventory handler = getHandlerFromIndex(index);
+            return handler != null && handler.isValid(getSlotFromIndex(slot, index), stack);
+        }
+
+        @Override
+        public int getMaxAmountPerStack() {
+            int max = 0;
+            for (FluidInventory handler : itemHandler) {
+                max = Math.max(max, handler.getMaxAmountPerStack());
+            }
+            return max;
+        }
     }
 
     public boolean consumeExperience(int amount, boolean special, boolean simulate) {
