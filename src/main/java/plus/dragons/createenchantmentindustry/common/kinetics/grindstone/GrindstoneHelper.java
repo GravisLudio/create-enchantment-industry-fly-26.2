@@ -72,7 +72,7 @@ public class GrindstoneHelper {
 
     public static int getExperienceFromItem(ItemStack stack) {
         int result = 0;
-        Map<Holder<Enchantment>, Integer> enchantments = CEIItemData.getEnchantments(stack);
+        Map<Holder<Enchantment>, Integer> enchantments = CEIItemData.getEnchantmentsForCrafting(stack);
         for (var entry : enchantments.entrySet()) {
             Holder<Enchantment> enchantment = entry.getKey();
             int level = entry.getValue();
@@ -102,7 +102,7 @@ public class GrindstoneHelper {
         } else if (top.getCount() <= 1 && bottom.getCount() <= 1) {
             if (topEmpty || bottomEmpty) {
                 ItemStack input = topEmpty ? bottom : top;
-                return CEIItemData.getEnchantments(input).isEmpty()
+                return CEIItemData.getEnchantmentsForCrafting(input).isEmpty()
                         ? ItemStack.EMPTY
                         : removeNonCursesFrom(input.copy());
             } else {
@@ -144,19 +144,19 @@ public class GrindstoneHelper {
     }
 
     private static void mergeEnchantsFrom(ItemStack top, ItemStack bottom) {
-        Map<Holder<Enchantment>, Integer> topEnchantments = new LinkedHashMap<>(CEIItemData.getEnchantments(top));
-        for (var entry : CEIItemData.getEnchantments(bottom).entrySet()) {
+        Map<Holder<Enchantment>, Integer> topEnchantments = new LinkedHashMap<>(CEIItemData.getEnchantmentsForCrafting(top));
+        for (var entry : CEIItemData.getEnchantmentsForCrafting(bottom).entrySet()) {
             Holder<Enchantment> enchantment = entry.getKey();
             if (!enchantment.is(EnchantmentTags.CURSE) || !topEnchantments.containsKey(enchantment))
                 topEnchantments.merge(enchantment, entry.getValue(), Math::max);
         }
-        CEIItemData.setEnchantments(top, topEnchantments);
+        CEIItemData.setEnchantmentsForCrafting(top, topEnchantments);
     }
 
     public static ItemStack removeNonCursesFrom(ItemStack input) {
-        Map<Holder<Enchantment>, Integer> enchantments = new LinkedHashMap<>(CEIItemData.getEnchantments(input));
+        Map<Holder<Enchantment>, Integer> enchantments = new LinkedHashMap<>(CEIItemData.getEnchantmentsForCrafting(input));
         enchantments.keySet().removeIf(enchantment -> !enchantment.is(EnchantmentTags.CURSE));
-        CEIItemData.setEnchantments(input, enchantments);
+        CEIItemData.setEnchantmentsForCrafting(input, enchantments);
         if (input.is(Items.ENCHANTED_BOOK) && enchantments.isEmpty()) {
             input = CEIItemData.transmuteCopy(input, Items.BOOK);
         }

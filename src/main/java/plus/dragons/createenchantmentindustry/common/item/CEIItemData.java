@@ -62,6 +62,19 @@ public final class CEIItemData {
         return stored.isEmpty() ? getEnchantments(stack) : stored;
     }
 
+    /**
+     * Writes back to whichever component {@link #getEnchantmentsForCrafting} read from. Needed because the
+     * vanilla helpers pick their component with {@code stack.is(Items.ENCHANTED_BOOK)}, so an enchanting
+     * template -- which carries its enchantments in STORED_ENCHANTMENTS without being an enchanted book --
+     * would be read from one component and written to the other.
+     */
+    public static void setEnchantmentsForCrafting(ItemStack stack, Map<Holder<Enchantment>, Integer> enchantments) {
+        if (getStoredEnchantments(stack).isEmpty())
+            setEnchantments(stack, enchantments);
+        else
+            setStoredEnchantments(stack, enchantments);
+    }
+
     public static int getRepairCost(ItemStack stack) {
         return stack.getOrDefault(DataComponents.REPAIR_COST, 0);
     }
