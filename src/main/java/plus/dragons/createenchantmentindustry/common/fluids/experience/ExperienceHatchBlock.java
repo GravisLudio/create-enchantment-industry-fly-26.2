@@ -125,6 +125,10 @@ public class ExperienceHatchBlock extends HorizontalDirectionalBlock
 
         if (player.isSecondaryUseActive()) {
             FluidStack fluid = filter.getFluidToDrain();
+            // Un filtro puesto en un fluido sin unidad de experiencia da un stack vacio, y la Transfer
+            // API de Fabric rechaza una variante en blanco con IllegalArgumentException.
+            if (fluid.isEmpty())
+                return InteractionResult.PASS;
             long extracted;
             try (Transaction transaction = Transaction.openOuter()) {
                 extracted = tankCapability.extract(CEITransfer.variantOf(fluid), fluid.getAmount(), transaction);
@@ -145,6 +149,10 @@ public class ExperienceHatchBlock extends HorizontalDirectionalBlock
         } else {
             int experience = ExperienceHelper.getExperienceForPlayer(player);
             FluidStack fluid = filter.getFluidToFill(experience);
+            // Sin experiencia getFluidToFill devuelve FluidStack.EMPTY; sin este corte la insercion
+            // lanzaba "Transfer variant may not be blank" y el servidor la suprimia en el log.
+            if (fluid.isEmpty())
+                return InteractionResult.PASS;
             long filled;
             try (Transaction transaction = Transaction.openOuter()) {
                 filled = tankCapability.insert(CEITransfer.variantOf(fluid), fluid.getAmount(), transaction);
